@@ -4,7 +4,7 @@ import 'package:sample_auth/pages/auth/register/bloc/register_bloc.dart';
 import 'package:sample_auth/pages/auth/verify/bloc/verify_bloc.dart';
 import 'package:sample_auth/pages/auth/verify/bloc/verify_event.dart';
 import 'package:sample_auth/pages/home/screen/home.dart';
-import 'package:sample_auth/pages/init/bloc/init_block.dart';
+import 'package:sample_auth/pages/init/bloc/init_bloc.dart';
 
 class VerifyScreen extends StatelessWidget {
   static const String routeName = '/verify/';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sample_auth/pages/auth/auth.dart';
 import 'package:sample_auth/pages/auth/register/screen/register_screen.dart';
-import 'package:sample_auth/pages/init/bloc/init_block.dart';
+import 'package:sample_auth/pages/init/bloc/init_bloc.dart';
 
 class IntroScreen extends StatelessWidget {
   static const String routeName = '/intro/';

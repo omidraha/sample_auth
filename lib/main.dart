@@ -6,7 +6,7 @@ import 'package:sample_auth/pages/home/screen/home.dart';
 import 'pages/auth/register/bloc/register_bloc.dart';
 import 'pages/auth/verify/bloc/verify_bloc.dart';
 import 'pages/home/bloc/home_bloc.dart';
-import 'pages/init/bloc/init_block.dart';
+import 'pages/init/bloc/init_bloc.dart';
 import 'pages/init/bloc/init_event.dart';
 import 'pages/init/bloc/init_state.dart';
 import 'pages/init/screen/splash.dart';
