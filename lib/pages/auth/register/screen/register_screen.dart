@@ -6,7 +6,7 @@ import 'package:sample_auth/pages/auth/verify/screen/verify_screen.dart';
 import 'package:sample_auth/pages/init/bloc/init_bloc.dart';
 
 class RegisterScreen extends StatelessWidget {
-  static const String routeName = '/register/';
+  static const String routeName = 'auth/register/';
 
   @override
   Widget build(BuildContext context) {

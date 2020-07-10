@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sample_auth/pages/auth/auth.dart';
+import 'package:sample_auth/pages/auth/register/screen/register_screen.dart';
 import 'package:sample_auth/pages/home/screen/home.dart';
 
 import 'pages/auth/register/bloc/register_bloc.dart';
@@ -54,8 +55,8 @@ class MyApp extends StatelessWidget {
             child: Navigator(
                 // @note: Actually I would like to have something like this:
                 // /auth/register/ and /auth/verify/ for routing this flow,
-                // But i don't know how to have this route.
-                initialRoute: '/auth/',
+                // But i don't know how to achieve this route.
+                initialRoute: RegisterScreen.routeName,
                 onGenerateRoute: (RouteSettings settings) =>
                     AuthScreen.route(settings)),
           );
