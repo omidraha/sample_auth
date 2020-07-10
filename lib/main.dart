@@ -14,6 +14,8 @@ import 'pages/init/screen/splash.dart';
 import 'pages/intro/screen/intro.dart';
 import 'repository/user_repository.dart';
 
+GlobalKey<NavigatorState> navigatorKeyForAuth = GlobalKey<NavigatorState>();
+
 void main() async {
   UserRepository userRepository = UserRepository();
   runApp(BlocProvider<InitBloc>(
@@ -52,13 +54,22 @@ class MyApp extends StatelessWidget {
                 );
               }),
             ],
-            child: Navigator(
-                // @note: Actually I would like to have something like this:
-                // /auth/register/ and /auth/verify/ for routing this flow,
-                // But i don't know how to achieve this route.
-                initialRoute: RegisterScreen.routeName,
-                onGenerateRoute: (RouteSettings settings) =>
-                    AuthScreen.route(settings)),
+            child: WillPopScope(
+              onWillPop: () async {
+                navigatorKeyForAuth.currentState.popUntil((route) {
+                  return (route.settings.name == RegisterScreen.routeName);
+                });
+                return false;
+              },
+              child: Navigator(
+                  key: navigatorKeyForAuth,
+                  // @note: Actually I would like to have something like this:
+                  // /auth/register/ and /auth/verify/ for routing this flow,
+                  // But i don't know how to achieve this route.
+                  initialRoute: RegisterScreen.routeName,
+                  onGenerateRoute: (RouteSettings settings) =>
+                      AuthScreen.route(settings)),
+            ),
           );
         },
         // Home
