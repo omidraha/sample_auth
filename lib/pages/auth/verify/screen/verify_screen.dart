@@ -24,8 +24,6 @@ class VerifyScreen extends StatelessWidget {
             VerifyBloc verifyBloc = BlocProvider.of<VerifyBloc>(context);
             print('VerifyScreen.verifyBloc.state: ${verifyBloc.state}');
             verifyBloc..add(UserSubmitVerificationCode());
-            // @note: this line is not navigate to home page, and go to the register page instead.
-            // In real code I run this on the BlocListener but not effect this issue.
             Navigator.of(context, rootNavigator: true)
                 .pushNamed(HomeScreen.routeName);
           },
