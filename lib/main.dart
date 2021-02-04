@@ -1,28 +1,21 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sample_auth/pages/auth/auth.dart';
-import 'package:sample_auth/pages/auth/register/screen/register_screen.dart';
-import 'package:sample_auth/pages/home/screen/home.dart';
+import 'package:sample_auth/pages/feature_one/bloc/feature_one_event.dart';
+import 'package:sample_auth/pages/feature_one/bloc/feature_one_state.dart';
+import 'package:sample_auth/pages/feature_one/screen/feature_one_screen.dart';
 
-import 'pages/auth/register/bloc/register_bloc.dart';
-import 'pages/auth/verify/bloc/verify_bloc.dart';
-import 'pages/home/bloc/home_bloc.dart';
-import 'pages/init/bloc/init_bloc.dart';
-import 'pages/init/bloc/init_event.dart';
-import 'pages/init/bloc/init_state.dart';
-import 'pages/init/screen/splash.dart';
-import 'pages/intro/screen/intro.dart';
+import 'pages/feature_one/bloc/feature_one_bloc.dart';
+import 'pages/feature_two/bloc/feature_two_bloc.dart';
+import 'pages/feature_two/screen/feature_two_screen.dart';
 import 'repository/user_repository.dart';
 
 GlobalKey<NavigatorState> navigatorKeyForAuth = GlobalKey<NavigatorState>();
 
 void main() async {
   UserRepository userRepository = UserRepository();
-  runApp(BlocProvider<InitBloc>(
-      create: (BuildContext context) {
-        return InitBloc(userRepository: userRepository)..add(LoadUser());
-      },
-      child: MyApp(userRepository: userRepository)));
+  runApp(MyApp(userRepository: userRepository));
 }
 
 class MyApp extends StatelessWidget {
@@ -31,66 +24,105 @@ class MyApp extends StatelessWidget {
   const MyApp({Key key, this.userRepository}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        backgroundColor: Colors.white,
-      ),
-      routes: {
-        // Intro
-        IntroScreen.routeName: (context) => IntroScreen(),
-        // Auth (Register/Verify)
-        AuthScreen.routeName: (context) {
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider<RegisterBloc>(create: (BuildContext context) {
-                return RegisterBloc(userRepository: userRepository);
-              }),
-              BlocProvider<VerifyBloc>(create: (BuildContext context) {
-                return VerifyBloc(
-                  userRepository: userRepository,
-                );
-              }),
-            ],
-            child: WillPopScope(
-              onWillPop: () async {
-                navigatorKeyForAuth.currentState.popUntil((route) {
-                  return (route.settings.name == RegisterScreen.routeName);
-                });
-                return false;
-              },
-              child: Navigator(
-                  key: navigatorKeyForAuth,
-                  // @note: Actually I would like to have something like this:
-                  // /auth/register/ and /auth/verify/ for routing this flow,
-                  // But i don't know how to achieve this route.
-                  initialRoute: RegisterScreen.routeName,
-                  onGenerateRoute: (RouteSettings settings) =>
-                      AuthScreen.route(settings)),
-            ),
-          );
-        },
-        // Home
-        HomeScreen.routeName: (context) => BlocProvider<HomeBloc>(
-            create: (BuildContext context) {
-              return HomeBloc(userRepository: userRepository);
-            },
-            child: HomeScreen()),
+    // FeatureOne
+    BlocProvider featureOneBlocProvider = BlocProvider<FeatureOneBloc>(
+      create: (BuildContext context) {
+        return FeatureOneBloc(userRepository: userRepository);
       },
-      home: BlocBuilder<InitBloc, InitState>(
-          builder: (BuildContext context, state) {
-        print('main.BlocBuilder.state: $state');
-        if (state == AppIsLoading() || state == UserIsLoading()) {
-          return SplashScreen();
-        } else if (state == UserIsNotExist()) {
-          return IntroScreen();
-        }
-        return Center(
-          child: Text('No state !'),
-        );
-      }),
+      child: FeatureOneScreen(),
     );
+    // FeatureTwo
+    BlocProvider featureTwoBocProvider = BlocProvider<FeatureTwoBloc>(
+      create: (BuildContext context) {
+        return FeatureTwoBloc(userRepository: userRepository);
+      },
+      child: FeatureTwoScreen(),
+    );
+    // RectTween _createRectTween(Rect begin, Rect end) {
+    //   return CustomRectTween(begin: begin, end: end);
+    // }
+
+    // final heroC = HeroController(createRectTween: _createRectTween);
+    return MaterialApp(
+        // navigatorObservers: [heroC],
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          backgroundColor: Colors.white,
+        ),
+        home: featureOneBlocProvider,
+        onGenerateRoute: (RouteSettings settings) {
+          print('RouteSettings: $settings');
+          WidgetBuilder builder;
+          switch (settings.name) {
+            // Intro
+            case FeatureOneScreen.routeName:
+              builder = (BuildContext _) => featureOneBlocProvider;
+              break;
+            case FeatureTwoScreen.routeName:
+              builder = (BuildContext _) => featureTwoBocProvider;
+              break;
+          }
+          return CustomPageRoute(
+            builder: builder,
+            settings: settings,
+          );
+        });
   }
 }
+
+class CustomPageRoute extends MaterialPageRoute {
+  CustomPageRoute({builder, settings})
+      : super(
+          builder: builder,
+          settings: settings,
+        );
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 1500);
+
+  // @override
+  // Widget buildTransitions(BuildContext context, Animation<double> animation,
+  //     Animation<double> secondaryAnimation, Widget child) {
+  //   return SlideTransition(
+  //     position: Tween<Offset>(
+  //       begin: Offset(1.0, 0),
+  //       end: Offset.zero,
+  //     ).animate(animation),
+  //     child: SlideTransition(
+  //       position: Tween<Offset>(
+  //         begin: Offset.zero,
+  //         end: Offset(-1.0, 0),
+  //       ).animate(secondaryAnimation),
+  //       child: child,
+  //     ),
+  //   );
+  // }
+}
+
+// class CustomRectTween extends RectTween {
+//   CustomRectTween({Rect begin, Rect end}) : super(begin: begin, end: end) {}
+//
+//   @override
+//   Rect lerp(double t) {
+//     double height = end.top - begin.top;
+//     double width = end.left - begin.left;
+//
+//     double transformedY = transformValue(t);
+//
+//     double animatedX = begin.left + (t * width);
+//     double animatedY = begin.top + (transformedY * height);
+//
+//     return Rect.fromLTWH(animatedX, animatedY, 1, 1);
+//   }
+//
+//   double transformValue(double t) {
+//     final double s = 0.4 / 4.0;
+//     t = 2.0 * t - 1.0;
+//     if (t < 0.0)
+//       return -0.5 * pow(2.0, 10.0 * t) * sin((t - s) * (pi * 2.0) / 0.4);
+//     else
+//       return pow(2.0, -10.0 * t) * sin((t - s) * (pi * 2.0) / 0.4) * 0.5 + 1.0;
+//   }
+// }
